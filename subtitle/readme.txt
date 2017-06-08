@@ -13,3 +13,8 @@ find output/ -name "*.ass" -exec mv "{}" ./input/ass \;
 mkdir -p input/ssa
 find output/ -name "*.ssa" -exec mv "{}" ./input/ssa \;
 
+cd ./input
+python ../preprocess/extract_sentence_ssa.py > extract_sentence_ssa
+python ../preprocess/extract_sentence_ass.py > extract_sentence_ass
+python ../preprocess/extract_sentence_srt.py > extract_sentence_srt
+
