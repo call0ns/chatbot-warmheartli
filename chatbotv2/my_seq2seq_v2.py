@@ -181,12 +181,12 @@ class MySeq2Seq(object):
         decoder_inputs_tmp = tf.slice(input_data, [0, self.max_seq_len, 0], [-1, self.max_seq_len-1, self.word_vec_dim], name="dec_in_tmp")
         go_inputs = tf.ones_like(decoder_inputs_tmp)
         go_inputs = tf.slice(go_inputs, [0, 0, 0], [-1, 1, self.word_vec_dim])
-        decoder_inputs = tf.concat(1, [go_inputs, decoder_inputs_tmp], name="dec_in")
+        decoder_inputs = tf.concat([go_inputs, decoder_inputs_tmp], 1, name="dec_in")
 
         # 编码器
         # 把encoder_inputs交给编码器，返回一个输出(预测序列的第一个值)和一个状态(传给解码器)
         (encoder_output_tensor, states) = tflearn.lstm(encoder_inputs, self.word_vec_dim, return_state=True, scope='encoder_lstm')
-        encoder_output_sequence = tf.pack([encoder_output_tensor], axis=1)
+        encoder_output_sequence = tf.stack([encoder_output_tensor], axis=1)
 
         # 解码器
         # 预测过程用前一个时间序的输出作为下一个时间序的输入
@@ -196,7 +196,7 @@ class MySeq2Seq(object):
         else:
             first_dec_input = tf.slice(decoder_inputs, [0, 0, 0], [-1, 1, self.word_vec_dim])
         decoder_output_tensor = tflearn.lstm(first_dec_input, self.word_vec_dim, initial_state=states, return_seq=False, reuse=False, scope='decoder_lstm')
-        decoder_output_sequence_single = tf.pack([decoder_output_tensor], axis=1)
+        decoder_output_sequence_single = tf.stack([decoder_output_tensor], axis=1)
         decoder_output_sequence_list = [decoder_output_tensor]
         # 再用解码器的输出作为下一个时序的输入
         for i in range(self.max_seq_len-1):
@@ -205,11 +205,11 @@ class MySeq2Seq(object):
             else:
                 next_dec_input = tf.slice(decoder_inputs, [0, i+1, 0], [-1, 1, self.word_vec_dim])
             decoder_output_tensor = tflearn.lstm(next_dec_input, self.word_vec_dim, return_seq=False, reuse=True, scope='decoder_lstm')
-            decoder_output_sequence_single = tf.pack([decoder_output_tensor], axis=1)
+            decoder_output_sequence_single = tf.stack([decoder_output_tensor], axis=1)
             decoder_output_sequence_list.append(decoder_output_tensor)
 
-        decoder_output_sequence = tf.pack(decoder_output_sequence_list, axis=1)
-        real_output_sequence = tf.concat(1, [encoder_output_sequence, decoder_output_sequence])
+        decoder_output_sequence = tf.stack(decoder_output_sequence_list, axis=1)
+        real_output_sequence = tf.concat([encoder_output_sequence, decoder_output_sequence], 1)
 
         net = tflearn.regression(real_output_sequence, optimizer='sgd', learning_rate=0.1, loss='mean_square')
         model = tflearn.DNN(net)
