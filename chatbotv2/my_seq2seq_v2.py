@@ -4,8 +4,8 @@ import sys
 import math
 import tflearn
 import tensorflow as tf
-from tensorflow.python.ops import rnn_cell
-from tensorflow.python.ops import rnn
+# from tensorflow.python.ops import rnn_cell
+# from tensorflow.python.ops import rnn
 import chardet
 import numpy as np
 import struct
@@ -20,8 +20,8 @@ word_vec_dim = 200
 max_seq_len = 8
 word_set = {}
 
-def load_word_set():
-    file_object = open('./segment_result_lined.3000000.pair.less', 'r')
+def load_word_set(input_file):
+    file_object = open(input_file, 'r')
     while True:
         line = file_object.readline()
         if line:
@@ -141,17 +141,18 @@ class MySeq2Seq(object):
     输出的时候把解码器的输出按照词向量的200维展平，这样输出就是(?,seqlen*200)
     这样就可以通过regression来做回归计算了，输入的y也展平，保持一致
     """
-    def __init__(self, max_seq_len = 16, word_vec_dim = 200, input_file='./segment_result_lined.3000000.pair.less'):
+    def __init__(self, max_seq_len = 16, word_vec_dim = 200, input_file='./corpus.segment.pair.10000'):
         self.max_seq_len = max_seq_len
         self.word_vec_dim = word_vec_dim
         self.input_file = input_file
 
     def generate_trainig_data(self):
-        load_word_set()
+        load_word_set(self.input_file)
         load_vectors("./vectors.bin")
         init_seq(self.input_file)
         xy_data = []
         y_data = []
+        print "question_seqs=", len(question_seqs)
         for i in range(len(question_seqs)):
         #for i in range(100):
             question_seq = question_seqs[i]
