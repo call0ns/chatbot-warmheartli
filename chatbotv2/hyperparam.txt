@@ -1,0 +1,6 @@
+mode=train
+input_file=corpus.segment.pair
+vector_file=vectors.bin
+word_vec_dim=200
+max_seq_len=8
+
