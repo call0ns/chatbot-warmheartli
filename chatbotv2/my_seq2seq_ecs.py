@@ -17,7 +17,7 @@ tf.app.flags.DEFINE_string("input_file", "corpus.segment.pair", "input data file
 tf.app.flags.DEFINE_string("mode", "test", "Executing mode.")
 
 tf.app.flags.DEFINE_string("vector_file", "vectors.bin", "input vector file")
-tf.app.flags.DEFINE_integer("word_vec_dim", 200, "Dimension of word2vec.")
+tf.app.flags.DEFINE_integer("word_vec_dim", 100, "Dimension of word2vec.")
 
 tf.app.flags.DEFINE_integer("max_seq_len", 8, "max length of seq.")
 
@@ -29,8 +29,8 @@ answer_seqs = []
 max_w = 50
 float_size = 4
 word_vector_dict = {}
-word_vec_dim = 50
-max_seq_len = 8
+word_vec_dim = FLAGS.word_vec_dim
+max_seq_len = FLAGS.max_seq_len
 word_set = {}
 
 def load_word_set(input_file):
@@ -49,7 +49,7 @@ def load_word_set(input_file):
                 break
 
 def load_vectors(input):
-    """从vectors.bin加载词向量，返回一个word_vector_dict的词典，key是词，value是200维的向量
+    """从vectors.bin加载词向量，返回一个word_vector_dict的词典，key是词，value是100维的向量
     """
     print "begin load vectors"
     with tf.gfile.GFile(input, "rb") as input_file:
@@ -144,10 +144,10 @@ class MySeq2Seq(object):
     """
     思路：输入输出序列一起作为input，然后通过slick和unpack切分
     完全按照论文说的编码器解码器来做
-    输出的时候把解码器的输出按照词向量的200维展平，这样输出就是(?,seqlen*200)
+    输出的时候把解码器的输出按照词向量的100维展平，这样输出就是(?,seqlen*100)
     这样就可以通过regression来做回归计算了，输入的y也展平，保持一致
     """
-    def __init__(self, max_seq_len = 16, word_vec_dim = 200):
+    def __init__(self, max_seq_len = 16, word_vec_dim = 100):
         self.max_seq_len = max_seq_len
         self.word_vec_dim = word_vec_dim
 
