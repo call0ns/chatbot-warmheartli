@@ -29,7 +29,7 @@ answer_seqs = []
 max_w = 50
 float_size = 4
 word_vector_dict = {}
-word_vec_dim = 200
+word_vec_dim = 50
 max_seq_len = 8
 word_set = {}
 
